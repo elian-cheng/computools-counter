@@ -1,18 +1,17 @@
-import React, { useEffect, useRef } from "react";
-import { useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 
 const WS_CONNECTION = "ws://localhost:3000";
 
 function Counter() {
   const [count, setCount] = useState(0);
   const socket = useRef(null);
-  const latestCount = useRef(count); //save the latest value
+  const latestCount = useRef(count); // Save the latest value
 
   useEffect(() => {
     latestCount.current = count;
   }, [count]);
 
-  useEffect(() => {
+  const initializeWebSocket = useCallback(() => {
     socket.current = new WebSocket(WS_CONNECTION);
 
     socket.current.onmessage = message => {
@@ -25,6 +24,10 @@ function Counter() {
       socket.current?.close();
     };
   }, []);
+
+  useEffect(() => {
+    return initializeWebSocket();
+  }, [initializeWebSocket]);
 
   return (
     <>
